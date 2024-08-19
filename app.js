@@ -2,6 +2,10 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const bodyParser = require("body-parser");
+require("dotenv").config();
+
+const connectDB = require("./config/db");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -13,7 +17,9 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(process.cwd(), "public")));
+app.use(bodyParser.json());
+connectDB();
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
