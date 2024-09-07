@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const {
+	createUser,
+} = require("../src/Authentication/Controller/AuthenticaitonController");
 
 router.post("/signup", (req, res) => {
-	//singup method
-	console.log("singup");
-	res.send("");
+	createUser(req, res);
 });
 
 router.post("/singin", (req, resss) => {
