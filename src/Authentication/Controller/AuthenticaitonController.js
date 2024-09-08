@@ -32,9 +32,26 @@ const createUser = async (req, res) => {
 
 const login = async (req, res) => {
 	try {
-	} catch (error) {
-		console.log("error while logging in ", error);
-		res.status(400).json({ message: "error while loggin in " });
+		const { email, password } = req.body;
+		const user = await userModel.findOne({ email });
+		if (!user) {
+			return res.status(404).json({ message: "user not found" });
+		}
+		const isPasswordValid = await bcCrypt.compare(password, user.password);
+		if (!isPasswordValid) {
+			return res.status(400).json({ message: "password is invalid" });
+		}
+		const token = jwt.sign({ id: user._id, email: user.email }, jwtPassword, {
+			expiresIn: "1h",
+		});
+
+		res.status(200).json({
+			message: "login successful",
+			token,
+		});
+	} catch (e) {
+		console.log("error in login:: ", e);
+		res.status(500).json({ message: "error while logging in " });
 	}
 };
 
