@@ -5,12 +5,20 @@ const {
 	login,
 } = require("../src/Authentication/Controller/AuthenticaitonController");
 
-router.post("/signup", (req, res) => {
-	createUser(req, res);
+router.post("/signup", (req, res, next) => {
+	try {
+		createUser(req, res, next);
+	} catch (error) {
+		next(error);
+	}
 });
 
-router.post("/singin", (req, res) => {
-	login(req, res);
+router.post("/singin", (req, res, next) => {
+	try {
+		login(req, res, next);
+	} catch (error) {
+		next(error);
+	}
 });
 
 router.post("./logout", (req, res) => {

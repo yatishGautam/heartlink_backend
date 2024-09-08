@@ -9,7 +9,7 @@ const jwtPassword = process.env.JWT_SECRET;
 // @route   POST /api/users
 // @access  Public
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
 	try {
 		let user = {
 			name: req.body.name,
@@ -22,15 +22,14 @@ const createUser = async (req, res) => {
 		);
 		user.password = hashedPassword;
 		const userToSave = new userModel(user);
-		userToSave.save();
+		await userToSave.save();
 		res.status(200).json({ message: `user ${user.name} saved` });
-	} catch (e) {
-		console.error("error in creating user :", e);
-		res.status(400).json({ message: "cannot save the model" });
+	} catch (error) {
+		next(error);
 	}
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 		const user = await userModel.findOne({ email });
@@ -49,9 +48,9 @@ const login = async (req, res) => {
 			message: "login successful",
 			token,
 		});
-	} catch (e) {
+	} catch (error) {
 		console.log("error in login:: ", e);
-		res.status(500).json({ message: "error while logging in " });
+		next(error);
 	}
 };
 
