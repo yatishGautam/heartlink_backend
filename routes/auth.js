@@ -13,7 +13,7 @@ router.post("/signup", (req, res, next) => {
 	}
 });
 
-router.post("/singin", (req, res, next) => {
+router.post("/login", (req, res, next) => {
 	try {
 		login(req, res, next);
 	} catch (error) {
