@@ -1,4 +1,5 @@
-const userModel = require("../Model/userData");
+import userModel from "../Model/userData";
+import { Request, Response, NextFunction } from "express";
 const bcCrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -9,7 +10,7 @@ const jwtPassword = process.env.JWT_SECRET;
 // @route   POST /api/users
 // @access  Public
 
-const createUser = async (req, res, next) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		let user = {
 			name: req.body.name,
@@ -29,7 +30,7 @@ const createUser = async (req, res, next) => {
 	}
 };
 
-const login = async (req, res, next) => {
+const login = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { email, password } = req.body;
 		const user = await userModel.findOne({ email });
@@ -49,7 +50,7 @@ const login = async (req, res, next) => {
 			token,
 		});
 	} catch (error) {
-		console.log("error in login:: ", e);
+		console.log("error in login:: ", error);
 		next(error);
 	}
 };

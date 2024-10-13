@@ -1,5 +1,7 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+
+const router = Router();
+
 const {
 	createUser,
 	login,
@@ -26,4 +28,4 @@ router.post("./logout", (req, res) => {
 	res.send();
 });
 
-module.exports = router;
+export default router;

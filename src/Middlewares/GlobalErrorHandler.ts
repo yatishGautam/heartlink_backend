@@ -1,7 +1,27 @@
-// globalErrorHandler.js
+import { Request, Response, NextFunction } from "express";
 
-const globalErrorHandler = (err, req, res, next) => {
-	// Log the error stack trace for debugging (you may want to disable this in production)
+// Define the structure of the error object (you can customize this based on your app)
+interface CustomError extends Error {
+	status?: number;
+	errors?: any;
+	code?: number;
+	keyValue?: any;
+	path?: string;
+	value?: any;
+}
+
+const globalErrorHandler: (
+	err: CustomError,
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => Response<any> | void = (
+	err: CustomError,
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	// Log the error stack trace for debugging (disable in production if needed)
 	console.error(err.stack);
 
 	// Handle specific errors
@@ -9,12 +29,11 @@ const globalErrorHandler = (err, req, res, next) => {
 		return res.status(400).json({
 			status: "fail",
 			message: err.message,
-			details: err.errors, // Additional details about the validation error
+			details: err.errors,
 		});
 	}
 
 	if (err.name === "MongoError" && err.code === 11000) {
-		// Duplicate key error in MongoDB (e.g., duplicate email)
 		return res.status(400).json({
 			status: "fail",
 			message: "Duplicate field value entered",
@@ -23,14 +42,12 @@ const globalErrorHandler = (err, req, res, next) => {
 	}
 
 	if (err.name === "CastError") {
-		// Handle invalid MongoDB object ID
 		return res.status(400).json({
 			status: "fail",
 			message: `Invalid ${err.path}: ${err.value}`,
 		});
 	}
 
-	// Handle SyntaxError for invalid JSON payload
 	if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
 		return res.status(400).json({
 			status: "fail",
@@ -39,10 +56,10 @@ const globalErrorHandler = (err, req, res, next) => {
 	}
 
 	// Default to 500 for server errors
-	res.status(err.status || 500).json({
+	return res.status(err.status || 500).json({
 		status: "error",
 		message: err.message || "Internal Server Error",
 	});
 };
 
-module.exports = globalErrorHandler;
+export default globalErrorHandler;
