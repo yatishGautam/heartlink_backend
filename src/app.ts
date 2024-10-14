@@ -9,6 +9,7 @@ import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
 import authRouter from "./routes/auth";
 import globalErrorHandler from "./Middlewares/GlobalErrorHandler";
+import { ErrorRequestHandler } from "express";
 
 dotenv.config();
 
@@ -36,6 +37,6 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 
 // Place error-handling middleware **after** the route handlers
-// app.use(globalErrorHandler);
+app.use(globalErrorHandler as ErrorRequestHandler);
 
 export default app;

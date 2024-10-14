@@ -2,10 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import userModel from "../Model/userData"; // Ensure that userModel is exported as a default export in the userData model
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+// import ErrorWithStatus from "../../types/global";
 
 // Type definitions for environment variables
-const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10; // Adding default value
-const jwtPassword = process.env.JWT_SECRET || "default_jwt_secret"; // Adding default value
+const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
+const jwtPassword = process.env.JWT_SECRET || "default_jwt_secret";
 
 // @desc    Create a new user
 // @route   POST /api/users
@@ -22,6 +23,8 @@ export const createUser = async (
 			email: req.body.email as string,
 		};
 
+		console.log(user);
+
 		const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
 		user.password = hashedPassword;
 
@@ -29,7 +32,7 @@ export const createUser = async (
 		await userToSave.save();
 
 		res.status(200).json({ message: `User ${user.name} saved` });
-	} catch (error) {
+	} catch (error: unknown) {
 		next(error);
 	}
 };
@@ -63,8 +66,7 @@ export const login = async (
 			message: "Login successful",
 			token,
 		});
-	} catch (error) {
-		console.error("Error in login::", error);
+	} catch (error: unknown) {
 		next(error);
 	}
 };

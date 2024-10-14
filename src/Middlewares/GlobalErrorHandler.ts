@@ -1,17 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
-interface ErrorWithStatus extends Error {
-	status?: number;
-	errors?: any;
-	keyValue?: any;
-	code?: number;
-	path?: string;
-	value?: string;
-}
-
-// Global error handler middleware
 const globalErrorHandler = (
-	err: ErrorWithStatus,
+	err: any, // Use 'any' here for flexibility
 	req: Request,
 	res: Response,
 	next: NextFunction
@@ -43,15 +33,22 @@ const globalErrorHandler = (
 		});
 	}
 
-	if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+	// Safely check if err is a SyntaxError and has status
+	if (
+		err instanceof SyntaxError &&
+		"status" in err &&
+		err.status === 400 &&
+		"body" in err
+	) {
 		return res.status(400).json({
 			status: "fail",
 			message: "Invalid JSON payload",
 		});
 	}
 
-	// Default to 500 for server errors
-	res.status(err.status || 500).json({
+	// Default to 500 for server errors, check if 'status' exists
+	const statusCode = err.status || 500;
+	res.status(statusCode).json({
 		status: "error",
 		message: err.message || "Internal Server Error",
 	});
