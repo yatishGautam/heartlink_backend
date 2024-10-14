@@ -1,7 +1,12 @@
-// globalErrorHandler.js
+import { Request, Response, NextFunction } from "express";
 
-const globalErrorHandler = (err, req, res, next) => {
-	// Log the error stack trace for debugging (you may want to disable this in production)
+const globalErrorHandler = (
+	err: any, // Use 'any' here for flexibility
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Response<any> | void => {
+	// Log the error stack trace for debugging
 	console.error(err.stack);
 
 	// Handle specific errors
@@ -9,12 +14,11 @@ const globalErrorHandler = (err, req, res, next) => {
 		return res.status(400).json({
 			status: "fail",
 			message: err.message,
-			details: err.errors, // Additional details about the validation error
+			details: err.errors,
 		});
 	}
 
 	if (err.name === "MongoError" && err.code === 11000) {
-		// Duplicate key error in MongoDB (e.g., duplicate email)
 		return res.status(400).json({
 			status: "fail",
 			message: "Duplicate field value entered",
@@ -23,26 +27,31 @@ const globalErrorHandler = (err, req, res, next) => {
 	}
 
 	if (err.name === "CastError") {
-		// Handle invalid MongoDB object ID
 		return res.status(400).json({
 			status: "fail",
 			message: `Invalid ${err.path}: ${err.value}`,
 		});
 	}
 
-	// Handle SyntaxError for invalid JSON payload
-	if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+	// Safely check if err is a SyntaxError and has status
+	if (
+		err instanceof SyntaxError &&
+		"status" in err &&
+		err.status === 400 &&
+		"body" in err
+	) {
 		return res.status(400).json({
 			status: "fail",
 			message: "Invalid JSON payload",
 		});
 	}
 
-	// Default to 500 for server errors
-	res.status(err.status || 500).json({
+	// Default to 500 for server errors, check if 'status' exists
+	const statusCode = err.status || 500;
+	res.status(statusCode).json({
 		status: "error",
 		message: err.message || "Internal Server Error",
 	});
 };
 
-module.exports = globalErrorHandler;
+export default globalErrorHandler;
