@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 
 // Type definitions for environment variables
 const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
-const jwtPassword = process.env.JWT_SECRET || "default_jwt_secret";
 
 // @desc    Create a new user
 // @route   POST /api/users
@@ -47,7 +46,7 @@ export const login = async (
 ) => {
 	try {
 		const { email, password } = req.body as { email: string; password: string };
-
+		const jwtPassword = process.env.JWT_SECRET || "default_jwt_secret";
 		const user = await userModel.findOne({ email });
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });

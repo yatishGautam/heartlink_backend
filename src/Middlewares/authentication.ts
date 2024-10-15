@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const jwtPassword = process.env.JWT_SECRET;
-
-// Extend Request interface to include `user` property
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
 	user?: any;
 }
 
@@ -14,6 +11,7 @@ const authenticateMiddleware = (
 	next: NextFunction
 ) => {
 	const authHeader = req.headers.authorization;
+	const jwtPassword = process.env.JWT_SECRET;
 
 	if (authHeader) {
 		const token = authHeader.split(" ")[1];

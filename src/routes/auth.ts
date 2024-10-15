@@ -8,7 +8,6 @@ const router = express.Router();
 
 router.post("/signup", (req: Request, res: Response, next: NextFunction) => {
 	try {
-		console.log(req);
 		createUser(req, res, next);
 	} catch (error) {
 		next(error);
