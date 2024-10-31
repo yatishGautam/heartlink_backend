@@ -18,6 +18,21 @@ const globalErrorHandler = (
 		});
 	}
 
+	// Handle 401 Unauthorized errors
+	if (err.status === 401) {
+		return res.status(401).json({
+			status: "fail",
+			message: "Unauthorized",
+		});
+	}
+
+	if (err.status === 404) {
+		return res.status(404).json({
+			status: "fail",
+			message: err.message || "Not Found",
+		});
+	}
+
 	if (err.name === "MongoError" && err.code === 11000) {
 		return res.status(400).json({
 			status: "fail",

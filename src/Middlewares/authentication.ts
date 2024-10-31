@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 
 export interface AuthenticatedRequest extends Request {
 	user?: any;
 }
 
-const authenticateMiddleware = (
+const authenticateMiddleware: RequestHandler = (
 	req: AuthenticatedRequest,
 	res: Response,
 	next: NextFunction
@@ -13,22 +13,21 @@ const authenticateMiddleware = (
 	const authHeader = req.headers.authorization;
 	const jwtPassword = process.env.JWT_SECRET;
 
-	if (authHeader) {
-		const token = authHeader.split(" ")[1];
-		jwt.verify(token, jwtPassword as string, (err, user) => {
-			if (err) {
-				return res
-					.status(403)
-					.json({ message: "Forbidden, invalid or expired token" });
-			}
-			req.user = user;
-			next();
-		});
-	} else {
-		return res
-			.status(401)
-			.json({ message: "Unauthorized. Token not provided" });
+	if (!authHeader) {
+		const error = new Error("Unauthorized. Token not provided") as any;
+		error.status = 401;
+		return next(error);
 	}
+	const token = authHeader.split(" ")[1];
+	jwt.verify(token, jwtPassword as string, (err, user) => {
+		if (err) {
+			const error = new Error("Forbidden, invalid or expired token") as any;
+			error.status = 403;
+			return next(error);
+		}
+		req.user = user;
+		next();
+	});
 };
 
 export default authenticateMiddleware;

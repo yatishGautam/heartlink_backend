@@ -13,12 +13,6 @@ router.get(
 	}
 );
 
-router.post(
-	"/updateprofiledata",
-	(req: Request, res: Response, next: NextFunction) => {
-		authenticateMiddleware(req, res, next);
-		updateProfileData(req, res, next);
-	}
-);
+router.post("/updateprofiledata", authenticateMiddleware, updateProfileData);
 
 export default router;
