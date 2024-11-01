@@ -5,13 +5,7 @@ import authenticateMiddleware from "../Middlewares/authentication";
 const router = express.Router();
 
 /* GET users listing. */
-router.get(
-	"/getprofiledata",
-	(req: Request, res: Response, next: NextFunction) => {
-		authenticateMiddleware(req, res, next);
-		getProfileData(req, res, next);
-	}
-);
+router.get("/getprofiledata", authenticateMiddleware, getProfileData);
 
 router.post("/updateprofiledata", authenticateMiddleware, updateProfileData);
 
